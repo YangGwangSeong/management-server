@@ -13,7 +13,7 @@ import { ReviewModel } from 'src/reviews/reviews.model';
 	deletedAt: false,
 	version: false,
 })
-export class ViewModel extends Model {
+export class ViewModel extends Model<ViewModel> {
 	@ForeignKey(() => MovieModel)
 	@Column
 	movieId: number;
