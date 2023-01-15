@@ -18,7 +18,7 @@ export class JWTStrategy extends PassportStrategy(Strategy) {
 		});
 	}
 
-	// async validate({id}: ){
-	//     return this.userModel.findByPk(id);
-	// }
+	async validate({ id }: Pick<UserModel, 'id'>) {
+		return this.userModel.findByPk(id);
+	}
 }

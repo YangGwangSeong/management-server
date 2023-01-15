@@ -1,6 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Op, WhereOptions } from 'sequelize';
+import { UserModel } from 'src/auth/users.model';
+import { ReviewModel } from 'src/reviews/reviews.model';
 import { MovieDto } from './dto/movies.dto';
 import { MovieModel } from './movies.model';
 
@@ -16,7 +18,8 @@ export class MoviesService {
 			where: { id },
 			include: [
 				{
-					all: true,
+					model: ReviewModel,
+					include: [UserModel],
 				},
 			],
 		});
@@ -38,7 +41,7 @@ export class MoviesService {
 			where: {
 				...options,
 			},
-			order: [['createAt', 'DESC']],
+			order: [['createdAt', 'DESC']],
 			include: [
 				{
 					all: true,
@@ -47,7 +50,7 @@ export class MoviesService {
 		});
 	}
 
-	async createMovie(userId: number, dto: MovieDto) {
+	async createMovie() {
 		const movie = await this.movieModel.create();
 		return movie.id;
 	}
@@ -65,7 +68,5 @@ export class MoviesService {
 		return this.movieModel.destroy({ where: { id } });
 	}
 
-	async updateCountViews(id: number) {
-		// const movie = await this.getMoviebyId(id);
-	}
+	async updateCountViews(id: number) {}
 }

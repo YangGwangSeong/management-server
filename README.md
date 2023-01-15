@@ -7,4 +7,5 @@ $ npm install sequelize sequelize-typescript pg
 $ npm install --save-dev @types/sequelize
 $ npm install @nestjs/sequelize
 $ npm install --save-dev @faker-js/faker
+$ npm install dayjs
 ```
