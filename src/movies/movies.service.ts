@@ -1,4 +1,71 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/sequelize';
+import { Op, WhereOptions } from 'sequelize';
+import { MovieDto } from './dto/movies.dto';
+import { MovieModel } from './movies.model';
 
 @Injectable()
-export class MoviesService {}
+export class MoviesService {
+	constructor(
+		@InjectModel(MovieModel)
+		private readonly movieModel: typeof MovieModel,
+	) {}
+
+	async getMoviebyId(id: number, isPublic = false) {
+		const movie = await this.movieModel.findOne({
+			where: { id },
+			include: [
+				{
+					all: true,
+				},
+			],
+		});
+		if (!movie) throw new NotFoundException('Video not found');
+
+		return movie;
+	}
+
+	async getMovieAll(searchTerm?: string) {
+		let options: WhereOptions<MovieModel> = {};
+
+		if (searchTerm) {
+			options = {
+				[Op.or]: [{ name: { like: `%${searchTerm}%` } }],
+			};
+		}
+
+		return this.movieModel.findAll({
+			where: {
+				...options,
+			},
+			order: [['createAt', 'DESC']],
+			include: [
+				{
+					all: true,
+				},
+			],
+		});
+	}
+
+	async createMovie(userId: number, dto: MovieDto) {
+		const movie = await this.movieModel.create();
+		return movie.id;
+	}
+
+	async updateMovie(id: number, dto: MovieDto) {
+		const movie = await this.getMoviebyId(id);
+
+		return movie.update({
+			...movie,
+			...dto,
+		});
+	}
+
+	async deleteMovie(id: number) {
+		return this.movieModel.destroy({ where: { id } });
+	}
+
+	async updateCountViews(id: number) {
+		// const movie = await this.getMoviebyId(id);
+	}
+}
