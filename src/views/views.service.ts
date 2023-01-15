@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { ViewModel } from './views.model';
 import { fn, col, where, Op } from 'sequelize';
+import * as dayjs from 'dayjs';
+
 @Injectable()
 export class ViewsService {
 	constructor(
@@ -12,18 +14,19 @@ export class ViewsService {
 	async updateViews(movieId: number) {
 		const row = await this.viewModel.findOne({
 			where: {
-				[Op.and]: [where(fn('month', col('createdAt')), 3)],
+				movieId,
+				[Op.and]: [
+					fn('EXTRACT(MONTH from "createdAt") =', dayjs().get('month') + 1),
+				],
 			},
 		});
 
 		if (row) {
-			return this.viewModel.create({
-				movieId,
-			});
+			return row.increment('views');
 		}
 
-		return row.update({
-			views: row.views++,
+		return this.viewModel.create({
+			movieId,
 		});
 	}
 }
