@@ -11,5 +11,6 @@ $ npm install dayjs
 $ npm install app-root-path
 $ npm install -D @types/app-root-path
 $ npm install -D @types/multer
+$ npm install fs-extra
 $ npm install --save @nestjs/serve-static
 ```

@@ -33,7 +33,7 @@ export class MoviesService {
 
 		if (searchTerm) {
 			options = {
-				[Op.or]: [{ name: { like: `%${searchTerm}%` } }],
+				name: { [Op.like]: `%${searchTerm}%` },
 			};
 		}
 
