@@ -11,4 +11,10 @@ export class StatisticsController {
 	async getMainStatistics() {
 		return this.statisticsService.getMainStatistics();
 	}
+
+	@Get('/middle')
+	@Auth()
+	async getMiddleStatistics() {
+		return this.statisticsService.getMiddleStatistics();
+	}
 }

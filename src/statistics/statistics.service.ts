@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { col, fn } from 'sequelize';
+import { col, fn, literal } from 'sequelize';
 import { MovieModel } from 'src/movies/movies.model';
 import { ReviewModel } from 'src/reviews/reviews.model';
 import { ViewModel } from 'src/views/views.model';
@@ -26,7 +26,7 @@ export class StatisticsService {
 			.findAll({
 				attributes: [[fn('sum', col('views')), 'views']],
 			})
-			.then((data) => Number(data[0].views as any));
+			.then((data) => Number(data[0].views));
 
 		const averageRating = await this.movieModel
 			.findAll({
@@ -39,6 +39,27 @@ export class StatisticsService {
 			countMovies,
 			views,
 			averageRating,
+		};
+	}
+
+	async getMiddleStatistics() {
+		const totalFees = await this.movieModel
+			.findAll({
+				attributes: [[fn('sum', col('fees')), 'fees']],
+			})
+			.then((data) => Number(data[0].fees));
+
+		const viewsByMonth = await this.viewModel.findAll({
+			attributes: [
+				[fn('sum', col('views')), 'views'],
+				[fn('date_trunc', 'month', col('createdAt')), 'month'],
+			],
+			group: 'month',
+		});
+
+		return {
+			totalFees,
+			viewsByMonth,
 		};
 	}
 }
