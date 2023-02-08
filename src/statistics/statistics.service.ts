@@ -1,10 +1,33 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { col, fn, literal } from 'sequelize';
+import { col, fn } from 'sequelize';
 import { MovieModel } from 'src/movies/movies.model';
 import { ReviewModel } from 'src/reviews/reviews.model';
 import { ViewModel } from 'src/views/views.model';
 import { StatisticItemType } from './statistics.interface';
+import * as dayjs from 'dayjs';
+import * as updateLocale from 'dayjs/plugin/updateLocale';
+import * as customParserFormat from 'dayjs/plugin/customParseFormat';
+
+dayjs.extend(updateLocale);
+dayjs.extend(customParserFormat);
+
+dayjs.updateLocale('en', {
+	monthsShort: [
+		'Jan',
+		'Feb',
+		'Mar',
+		'Apr',
+		'May',
+		'Jun',
+		'Jul',
+		'Aug',
+		'Sep',
+		'Oct',
+		'Nov',
+		'Dec',
+	],
+});
 
 @Injectable()
 export class StatisticsService {
@@ -72,11 +95,17 @@ export class StatisticsService {
 				[fn('date_trunc', 'month', col('createdAt')), 'month'],
 			],
 			group: 'month',
+			order: [[col('month'), 'ASC']],
+			raw: true,
 		});
 
 		return {
 			totalFees,
-			viewsByMonth,
+			viewsByMonth: viewsByMonth.map((item) => ({
+				...item,
+				// @ts-ignore
+				month: dayjs(item.month).format('MMM'),
+			})),
 		};
 	}
 }
